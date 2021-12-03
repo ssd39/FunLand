@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FunLand</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css'
+    media="screen" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="./home/main.css">
+  <style>
+    html,
+    body {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+
+
+    }
+
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .mic:active {
+      transform: translateY(4px);
+    }
+
+    .strength {
+      font-size: 14px;
+      font-family: 'niko';
+      color: orange;
+    }
+
+    .stemina {
+      font-size: 14px;
+      font-family: 'niko';
+      color: green;
+    }
+
+    .stext {
+      font-size: 14px;
+      font-family: 'niko';
+      margin-left: 10px;
+    }
+
+    .mbuttons {
+      background-color: transparent;
+      border-width: 0;
+    }
+
+    .mbuttons:hover {
+      background-color: rgba(9, 168, 66, 0.3);
+    }
+
+    .smbuttons {
+      background-color: rgba(9, 168, 66);
+      color: white;
+      border-width: 0;
+
+    }
+
+    #menu_page {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    #menu_page::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+  <script type="text/javascript"
+    src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js'></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="./voxeet/voxeet-sdk.js"></script>
+</head>
+
+<body>
+  <div id="home" style="background-color: black; position:fixed; height: 100%; width: 100%;">
+    <canvas id="home_canvas" style="width: 100%; height: 100%;">
+    </canvas>
+    <div
+      style="position: fixed;display: flex; width: 100%;bottom: 2%;align-items: center;flex-direction: column; justify-content: center; pointer-events: none;">
+
+      <span class="janta">Powered by</span>
+      <div style="margin-top: 10px;margin-bottom: 10px;">
+        <img src="https://cdn.loom.com/assets/favicons-loom/favicon.ico"
+          style="height: 32px;width: 32px;margin-right: 10px;" />
+      </div>
+      <span class="janta" style="font-family: 'Courier New', Courier, monospace;font-size: 12px;font-weight: bold;">Made
+        With ❤️ By Overclocked Brains</span>
+    </div>
+    <div
+      style="position: fixed;display: flex; width: 100%; top: 42%;align-items: center;flex-direction: column; justify-content: center; pointer-events: none;">
+      <h1 id="title_h">Enjoy the moments in metaverse</h1><br>
+      <h1></h1>
+      <div style="pointer-events: all; margin-top:20px;">
+        <button id="join" class="btn-init btn-rpl rpl-red" data-target="#basic_dialouge" data-toggle="modal"
+          hidden>Join</button>
+        <button id="create" class="btn-init btn-rpl rpl-red" data-target="#basic_dialouge"
+          data-toggle="modal">Create</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    var c = url.searchParams.get("meeting_id");
+    var t = url.searchParams.get("t");
+    if (c) {
+      $("#create").hide()
+      $("#join").show()
+      if (t) {
+        $("#title_h").text(atob(t))
+      }
+    }
+  </script>
+  <div id="basic_dialouge" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button data-dismiss="modal" class="close">&times;</button>
+          <form style="display: flex;justify-content: center;align-items: center;flex-direction: column;">
+            <div class="material-textfield" id="name_container" style="display: none;">
+              <input id="name" class="woei" placeholder=" " type="text">
+              <label class="woe">Your Name</label>
+            </div>
+            <div class="material-textfield" id="c_msg_div" hidden>
+              <input id="c_msg" class="woei" placeholder=" " type="text">
+              <label class="woe">Event Title</label>
+            </div>
+            <div id="btn_b" style="margin:10px;">
+              <button id="wfh" class="login">Let's Rock</button>
+            </div>
+            <div id="metaverse_url" style="display: none;" class="coden">
+              <a href=""></a>
+            </div>
+            <div id="loader" style="width: 80px;height: 80px; overflow: hidden; display: none;">
+              <div class="socket">
+                <div class="gel center-gel">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c1 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c2 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c3 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c4 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c5 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c6 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+                <div class="gel c7 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+                <div class="gel c8 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c9 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c10 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c11 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c12 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c13 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c14 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c15 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c16 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c17 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c18 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c19 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c20 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c21 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c22 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c23 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c24 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c25 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c26 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c28 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c29 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c30 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c31 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c32 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c33 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c34 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c35 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c36 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c37 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+              </div>
+            </div>
+            <span class="loader_text" style="display: none;" id="loadertx">
+            </span>
+            <div id="btn_c" style="margin:10px; display: none;">
+              <button id="clnk" class="login">Copy Link</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="add_mneu" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button data-dismiss="modal" class="close">&times;</button>
+          <form style="display: flex;justify-content: center;align-items: center;flex-direction: column;">
+            <div class="material-textfield" >
+              <input id="aname" class="woei" placeholder=" " type="text">
+              <label class="woe">Activity Name</label>
+            </div>
+            <div class="material-textfield" >
+              <input id="aurl" class="woei" placeholder=" " type="text">
+              <label class="woe">Activity URL</label>
+            </div>
+            <div id="abtn_b" style="margin:10px;">
+              <button id="wfh" class="login">Add</button>
+            </div>
+            <div id="aloaderx" style="width: 80px;height: 80px; overflow: hidden; display: none;">
+              <div class="socket">
+                <div class="gel center-gel">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c1 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c2 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c3 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c4 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c5 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c6 r1">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+                <div class="gel c7 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+                <div class="gel c8 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c9 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c10 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c11 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c12 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c13 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c14 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c15 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c16 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c17 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c18 r2">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c19 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c20 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c21 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c22 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c23 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c24 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c25 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c26 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c28 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c29 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c30 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c31 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c32 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c33 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c34 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c35 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c36 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+                <div class="gel c37 r3">
+                  <div class="hex-brick h1"></div>
+                  <div class="hex-brick h2"></div>
+                  <div class="hex-brick h3"></div>
+                </div>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/home/main.js"></script>
+  <script src="/home/animation-helper.js"></script>
+  <div id="game" hidden>
+    <div
+      style="display: flex; flex-direction: column;align-items: flex-end; position: absolute;  right: 0;padding-left: 5;">
+        <img title="Microphone mute/unmute" style="margin-right: 10px; margin-top: 10px;" id="mic" class="mic"
+        src="icons/mmicrophone.png" height="48" width="48">
+        <img title="Microphone mute/unmute" style="margin-right: 10px; margin-top: 10px;" id="videoc" class="mic"
+        src="icons/videooff.png" height="48" width="48">
+        <img title="Screen control on/off" style="margin-right: 10px; margin-top: 10px;" id="cast" class="mic"
+        src="icons/castoff.png" height="48" width="48">
+        <img title="FPP on/off" style="margin-right: 10px; margin-top: 10px;" id="fpp" class="mic" src="icons/viewoff.png"
+        height="48" width="48">
+        <img title="Record" style="display: none; margin-right: 10px; margin-top: 10px;" id="rcd" class="mic" src="icons/record.png"
+        height="48" width="48">
+        <img  title="Menu" style="margin-right: 10px; margin-top: 10px;" id="menu" class="mic" src="icons/lines.png" height="48" width="48">
+            <div id="menu_page" style="display: flex;flex-direction: column;padding: 15px; border-radius: 30px;background-color: whitesmoke;margin-right: 10px;margin-top: 10px;display: none;overflow: auto;">
+              <div>
+                <span style="color: #09A842; font-weight: 800; font-size: xx-large;">
+                  Hi,
+                </span>
+                <br>
+                <span id="name_" style="color: black; font-weight: 800; font-size: medium;">
+                </span>
+              </div>
+              <div style="margin-top: 20px;">
+                  <div style="display: flex;justify-content: space-evenly;">
+                    <button style="font-size: 22px;padding: 5px; padding-left: 15px; padding-right: 15px;" id="ms" class="smbuttons">Activities</button>
+                    <button style="font-size: 22px;padding: 5px;padding-left: 15px; padding-right: 15px;" id="ws"  class="mbuttons">Moments</button>
+                  </div>
+              </div>
+              
+              <div id="list" style="width: 100%;display: flex;flex-direction: column;margin-top: 15px;"> 
+             
+              </div>
+              <div id="list1" style="width: 100%;display: flex;flex-direction: column;margin-top: 15px;">
+               
+              </div>
+            </div>
+    </div>
+  </div>
+  <div id="virtual_video_screens" hidden>
+
+  </div>
+  <canvas id="renderCanvas"  touch-action="none"></canvas>
+  <script src="dist/app.js"></script>
+
+  <iframe id="activity_board"  style="display: none; position: absolute;height:80%; width: 80%;top:0;bottom: 0; left:0;right: 0;margin: auto;"  src="" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+
+  </iframe>
+
+</body>
+
+</html>
